@@ -28,5 +28,23 @@ afterEvaluate {
         def targetName = variant.name.capitalize()
         def generateAssetsTask = tasks.findByName("generate${targetName}Assets")
         generateAssetsTask.dependsOn(fontCopyTask)
+        
+        // Adiciona dependência explícita para as tarefas de lint
+        def lintReportTask = tasks.findByName("generate${targetName}LintVitalReportModel")
+        if (lintReportTask != null) {
+            lintReportTask.dependsOn(fontCopyTask)
+        }
+        
+        def lintAnalyzeTask = tasks.findByName("lintVitalAnalyze${targetName}")
+        if (lintAnalyzeTask != null) {
+            lintAnalyzeTask.dependsOn(fontCopyTask)
+        }
+        
+        // Adiciona dependência para todas as tarefas de lint para segurança
+        tasks.all { task ->
+            if (task.name.contains("lint") && task.name.contains(targetName)) {
+                task.dependsOn(fontCopyTask)
+            }
+        }
     }
 }
